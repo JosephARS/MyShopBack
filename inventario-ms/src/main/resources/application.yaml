@@ -1,0 +1,30 @@
+server:
+  port: ${PORT:50}
+
+database:
+  hostname: localhost
+  name: inventario
+  port: 3306
+
+#config-server:
+#  hostname: localhost
+#  port: 8081
+
+spring:
+  # ===============================
+  # JPA / HIBERNATE
+  jpa:
+    database: mysql
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  application:
+    name: inventario-ws
+
+  # ===============================
+  # DB
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${database.hostname}:${database.port}/${database.name}?autoReconnect=true&serverTimezone=America/Bogota&nullCatalogMeansCurrent=true
+    username: root
+    password: mypass
