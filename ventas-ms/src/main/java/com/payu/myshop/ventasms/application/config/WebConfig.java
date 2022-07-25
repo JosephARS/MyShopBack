@@ -1,4 +1,4 @@
-package com.payu.myshop.inventarioms.application.config;
+package com.payu.myshop.ventasms.application.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
