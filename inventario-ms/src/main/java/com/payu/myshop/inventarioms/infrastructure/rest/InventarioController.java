@@ -1,6 +1,6 @@
 package com.payu.myshop.inventarioms.infrastructure.rest;
 
-import com.payu.myshop.inventarioms.domain.models.endpoints.ProductRequest;
+import com.payu.myshop.inventarioms.domain.models.endpoints.Inventario;
 import com.payu.myshop.inventarioms.domain.models.endpoints.ResponseWS;
 import com.payu.myshop.inventarioms.domain.ports.services.InventarioService;
 import lombok.AccessLevel;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -38,7 +39,7 @@ public class InventarioController {
     }
 
     @PostMapping(path = "/")
-    public ResponseWS createProduct(@Valid @RequestBody ProductRequest request){
+    public ResponseWS createProduct(@Valid @RequestBody Inventario request){
 
         return inventarioService.createProduct(request);
     }
@@ -50,8 +51,14 @@ public class InventarioController {
     }
 
     @PutMapping(path = "/")
-    public ResponseWS updateProduct(@Valid @RequestBody ProductRequest request){
+    public ResponseWS updateProduct(@Valid @RequestBody Inventario request){
         return inventarioService.updateProduct(request);
+    }
+
+    @PutMapping(path = "/stock/{accion}")
+    public ResponseWS updateStock(@Valid @RequestBody List<Inventario> listaProductos,
+                                  @PathVariable String accion){
+        return inventarioService.updateStock(listaProductos, accion);
     }
 
 

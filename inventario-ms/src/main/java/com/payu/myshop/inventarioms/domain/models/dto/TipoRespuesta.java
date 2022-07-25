@@ -1,4 +1,4 @@
-package com.payu.myshop.inventarioms.domain.models.endpoints;
+package com.payu.myshop.inventarioms.domain.models.dto;
 
 public enum TipoRespuesta {
 

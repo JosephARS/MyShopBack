@@ -1,4 +1,4 @@
-package com.payu.myshop.inventarioms.infrastructure.entities;
+package com.payu.myshop.inventarioms.infrastructure.db.entities;
 
 
 import lombok.*;
@@ -23,7 +23,7 @@ public class InventarioEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long idInventario;
 
-    @Column(name = "nombre",nullable = false, length = 50)
+    @Column(name = "nombre", length = 50)
     String nombre;
 
     @Column(name = "imgUrl",nullable = false, unique = true)

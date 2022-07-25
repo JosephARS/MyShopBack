@@ -1,12 +1,13 @@
 package com.payu.myshop.inventarioms.domain.usecases;
 
-import com.payu.myshop.inventarioms.domain.models.endpoints.ProductRequest;
+import com.payu.myshop.inventarioms.domain.models.endpoints.Inventario;
 import com.payu.myshop.inventarioms.domain.models.endpoints.ProductDetailResponse;
 import com.payu.myshop.inventarioms.domain.models.endpoints.ResponseWS;
-import com.payu.myshop.inventarioms.domain.models.endpoints.TipoRespuesta;
+import com.payu.myshop.inventarioms.domain.models.dto.TipoRespuesta;
+import com.payu.myshop.inventarioms.domain.ports.repositories.InventarioRepositoryPort;
 import com.payu.myshop.inventarioms.domain.ports.services.InventarioService;
-import com.payu.myshop.inventarioms.infrastructure.entities.InventarioEntity;
-import com.payu.myshop.inventarioms.domain.ports.repositories.InventarioRepository;
+import com.payu.myshop.inventarioms.infrastructure.db.entities.InventarioEntity;
+import com.payu.myshop.inventarioms.infrastructure.db.repository.InventarioRepository;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -25,22 +26,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class InventarioServiceImpl implements InventarioService {
 
-    InventarioRepository inventarioRepository;
+    InventarioRepositoryPort inventarioRepository;
 
     @Override
-    public ResponseWS createProduct(ProductRequest request) {
+    public ResponseWS createProduct(Inventario request) {
 
         ResponseWS oResponseWS = new ResponseWS();
         log.info("Request:" +  request);
         try{
-            InventarioEntity inventario = inventarioRepository.save(InventarioEntity.builder()
-                            .nombre(request.getNombre())
-                            .descripcion(request.getDescripcion())
-                            .imgUrl(request.getImgUrl())
-                            .precio(request.getPrecio())
-                            .stock(request.getStock())
-                            .activo(true)
-                    .build());
+            Inventario inventario = inventarioRepository.save(request);
 
             oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
             oResponseWS.setResultado(inventario);
@@ -62,30 +56,9 @@ public class InventarioServiceImpl implements InventarioService {
         List<Object> oProductList = new ArrayList<Object>();
 
         try {
-            List<InventarioEntity> inventarioList = inventarioRepository.findAll();
+            List<Inventario> inventarioList = inventarioRepository.findAll();
 
-            oProductList = inventarioList.stream().filter(product -> product.getActivo()).map(product -> ProductDetailResponse.builder()
-                    .idInventario(product.getIdInventario())
-                    .nombre(product.getNombre())
-                    .descripcion(product.getDescripcion())
-                    .imgUrl(product.getImgUrl())
-                    .precio(product.getPrecio())
-                    .stock(product.getStock())
-                    .build()).collect(Collectors.toList());
-
-//
-//
-//            inventarioList.forEach(product ->{
-//                oProductList.add(ProductDetailResponse.builder()
-//                        .idInventario(product.getIdInventario())
-//                        .nombre(product.getNombre())
-//                        .descripcion(product.getDescripcion())
-//                        .imgUrl(product.getImgUrl())
-//                        .precio(product.getPrecio())
-//                        .stock(product.getStock())
-//                        .build());
-//            });
-
+            oProductList = inventarioList.stream().filter(product -> product.getActivo()).collect(Collectors.toList());
 
             log.info(String.valueOf(oProductList));
 
@@ -105,16 +78,16 @@ public class InventarioServiceImpl implements InventarioService {
         ResponseWS oResponseWS = new ResponseWS();
 
         try {
-            Optional<InventarioEntity> product = inventarioRepository.findById(idInventario);
+            Inventario product = inventarioRepository.findById(idInventario);
 
             oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
             oResponseWS.setResultado(ProductDetailResponse.builder()
-                    .idInventario(product.get().getIdInventario())
-                    .nombre(product.get().getNombre())
-                    .descripcion(product.get().getDescripcion())
-                    .imgUrl(product.get().getImgUrl())
-                    .precio(product.get().getPrecio())
-                    .stock(product.get().getStock())
+                    .idInventario(product.getIdInventario())
+                    .nombre(product.getNombre())
+                    .descripcion(product.getDescripcion())
+                    .imgUrl(product.getImgUrl())
+                    .precio(product.getPrecio())
+                    .stock(product.getStock())
                     .build());
         } catch (Exception e){
             oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
@@ -125,21 +98,12 @@ public class InventarioServiceImpl implements InventarioService {
     }
 
     @Override
-    public ResponseWS updateProduct(ProductRequest request) {
+    public ResponseWS updateProduct(Inventario request) {
 
         ResponseWS oResponseWS = new ResponseWS();
 
         try{
-
-            Optional<InventarioEntity> productToUpdate = inventarioRepository.findById(request.getIdInventario());
-            productToUpdate.get().setIdInventario(request.getIdInventario());
-            productToUpdate.get().setNombre(request.getNombre());
-            productToUpdate.get().setDescripcion(request.getDescripcion());
-            productToUpdate.get().setPrecio(request.getPrecio());
-            productToUpdate.get().setStock(request.getStock());
-            productToUpdate.get().setImgUrl(request.getImgUrl());
-            log.info("Dimelo" + productToUpdate);
-            InventarioEntity inventario = inventarioRepository.save(productToUpdate.get());
+            Inventario inventario = inventarioRepository.updateProduct(request);
 
             oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
             oResponseWS.setResultado(inventario);
@@ -160,10 +124,8 @@ public class InventarioServiceImpl implements InventarioService {
         ResponseWS oResponseWS = new ResponseWS();
 
         try{
-            Optional<InventarioEntity> productToDelete = inventarioRepository.findById(idInventario);
-            productToDelete.get().setActivo(false);
 
-            InventarioEntity inventario = inventarioRepository.save(productToDelete.get());
+            Inventario inventario = inventarioRepository.deleteProduct(idInventario);
 
             oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
             oResponseWS.setResultado(inventario);
@@ -172,6 +134,25 @@ public class InventarioServiceImpl implements InventarioService {
             oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
             oResponseWS.setMensaje( e.getMessage() );
             log.error("Error eliminando producto " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
+        }
+
+        return oResponseWS;
+    }
+
+    @Override
+    public ResponseWS updateStock(List<Inventario> listaProductos, String accion) {
+
+        ResponseWS oResponseWS = new ResponseWS();
+
+        try{
+            inventarioRepository.updateStock(listaProductos, accion);
+
+            oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
+
+        } catch (Exception e){
+            oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
+            oResponseWS.setMensaje( e.getMessage() );
+            log.error("Error actualizando producto " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
         }
 
         return oResponseWS;

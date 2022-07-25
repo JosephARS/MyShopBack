@@ -1,5 +1,6 @@
 package com.payu.myshop.inventarioms.domain.models.endpoints;
 
+import com.payu.myshop.inventarioms.domain.models.dto.TipoRespuesta;
 import lombok.Data;
 
 import java.util.List;
