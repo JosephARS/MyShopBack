@@ -1,5 +1,6 @@
 package com.payu.myshop.inventarioms.domain.models.endpoints;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +14,8 @@ import javax.validation.constraints.PositiveOrZero;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductRequest {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Inventario {
 
     Long idInventario;
 
@@ -31,5 +33,9 @@ public class ProductRequest {
     @NotNull(message = "El campo 'stock' no puede ser nulo.")
     @PositiveOrZero
     Long stock;
+
+    Boolean activo;
+
+    Long cantidadCompra;
 
 }

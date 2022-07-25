@@ -1,0 +1,54 @@
+server:
+  port: ${PORT:51}
+
+database:
+  hostname: localhost
+  name: payment
+  port: 3306
+
+#config-server:
+#  hostname: localhost
+#  port: 8081
+
+spring:
+  # ===============================
+  # JPA / HIBERNATE
+  jpa:
+    database: mysql
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+  application:
+    name: transactional-ws
+
+  # ===============================
+  # DB
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${database.hostname}:${database.port}/${database.name}?autoReconnect=true&serverTimezone=America/Bogota&nullCatalogMeansCurrent=true
+    username: root
+    password: mypass
+
+payuAPI:
+  language: "es"
+  command: "SUBMIT_TRANSACTION"
+  apiKey: "4Vj8eK4rloUd272L48hsrarnUA"
+  apiLogin: "pRRXKOl8ikMmt9u"
+  accountId: "512321"
+  merchantId: "508029"
+  referenceCode: "TestPayU04"
+  description: "Payment test description"
+  notifyUrl: "http://www.payu.com/notify"
+  installmentsNumber: "1"
+  type: "AUTHORIZATION_AND_CAPTURE"
+  deviceSessionId: "vghs6tvkcle931686k1900o6e1"
+  ipAddress: "127.0.0.1"
+  cookie: "pt1t38347bs6jc9ruv2ecpv7o2"
+  userAgent: "Mozilla/5.0 (Windows NT 5.1; rv:18.0) Gecko/20100101 Firefox/18.0"
+  embedded: false
+  eci: "01"
+  cavv: "AOvG5rV058/iAAWhssPUAAADFA=="
+  xid: "Nmp3VFdWMlEwZ05pWGN3SGo4TDA="
+  directoryServerTransactionId: "00000-70000b-5cc9-0000-000000000cb"
+  url: "https://sandbox.api.payulatam.com/payments-api/4.0/service.cgi"
+  test: true
