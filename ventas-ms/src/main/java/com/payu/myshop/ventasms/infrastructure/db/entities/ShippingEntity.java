@@ -1,5 +1,6 @@
 package com.payu.myshop.ventasms.infrastructure.db.entities;
 
+import com.payu.myshop.ventasms.domain.models.dto.Shipping;
 import lombok.*;
 
 import javax.persistence.*;
@@ -26,4 +27,27 @@ public class ShippingEntity implements Serializable {
 
     @ManyToOne(optional = false) @JoinColumn(name = "idCliente")
     ClienteEntity cliente;
+
+    public ShippingEntity(Shipping shipping) {
+        idShipping = shipping.getIdShipping();
+        direccion = shipping.getDireccion();
+        ciudad = shipping.getCiudad();
+        departamento = shipping.getDepartamento();
+        pais = shipping.getPais();
+        postalCode = shipping.getPostalCode();
+
+
+    }
+
+    public Shipping toDto(){
+        return Shipping.builder()
+                .idShipping(idShipping)
+                .pais(pais)
+                .direccion(direccion)
+                .postalCode(postalCode)
+                .departamento(departamento)
+                .ciudad(ciudad)
+                .build();
+    }
+
 }

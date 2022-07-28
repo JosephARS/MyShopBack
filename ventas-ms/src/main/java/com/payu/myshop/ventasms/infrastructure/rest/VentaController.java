@@ -22,9 +22,12 @@ public class VentaController {
     VentaService ventaService;
 
     @PostMapping(path = "/")
-    public ResponseWS confirmarVenta(@Valid @RequestBody Venta request){
+    public ResponseWS confirmarVenta(@Valid @RequestBody Venta request,
+                                     @RequestParam(value = "idToken", required=false) String idToken,
+                                     @RequestParam(value = "maskedCardNumber", required=false) String maskedCardNumber,
+                                     @RequestParam(value = "franquicia", required=false) String franquicia){
 
-        return ventaService.confirmarVenta(request);
+        return ventaService.confirmarVenta(request, idToken, maskedCardNumber, franquicia);
     }
 
     @GetMapping("/")

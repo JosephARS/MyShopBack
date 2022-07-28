@@ -1,5 +1,6 @@
 package com.payu.myshop.ventasms.infrastructure.db.entities;
 
+import com.payu.myshop.ventasms.domain.models.dto.Venta;
 import lombok.*;
 
 import javax.persistence.*;
@@ -19,7 +20,7 @@ public class VentaEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long idVenta;
 
-    Long precio;
+    Long valor;
 
     @Temporal(TemporalType.TIMESTAMP)
     Date fecha;
@@ -33,4 +34,28 @@ public class VentaEntity implements Serializable {
     Long idPago;
 
     String estado;
+
+    public VentaEntity(Venta venta) {
+        idVenta = venta.getIdVenta();
+        valor = venta.getValor();
+        fecha = venta.getFecha();
+        cliente = new ClienteEntity(venta.getCliente());
+        shipping = new ShippingEntity(venta.getShipping());
+        idPago = venta.getIdPago();
+        estado = venta.getEstado();
+    }
+
+    public Venta toDto(){
+        return Venta.builder()
+                .idVenta(idVenta)
+                .cliente(cliente.toDto())
+                .fecha(fecha)
+                .idPago(idPago)
+                .valor(valor)
+                .estado(estado)
+                .shipping(shipping.toDto())
+                .build();
+    }
+
+
 }

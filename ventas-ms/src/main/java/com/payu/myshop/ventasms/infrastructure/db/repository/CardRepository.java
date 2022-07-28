@@ -1,4 +1,4 @@
-package com.payu.myshop.ventasms.domain.ports.repositories;
+package com.payu.myshop.ventasms.infrastructure.db.repository;
 
 import com.payu.myshop.ventasms.infrastructure.db.entities.CardEntity;
 import com.payu.myshop.ventasms.infrastructure.db.entities.ClienteEntity;

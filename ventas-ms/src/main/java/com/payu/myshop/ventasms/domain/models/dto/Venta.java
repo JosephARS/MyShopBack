@@ -1,13 +1,11 @@
 package com.payu.myshop.ventasms.domain.models.dto;
 
-import com.payu.myshop.ventasms.domain.models.dto.Cliente;
-import com.payu.myshop.ventasms.domain.models.dto.DetalleVenta;
-import com.payu.myshop.ventasms.domain.models.dto.Shipping;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -20,6 +18,7 @@ public class Venta {
     Long idPago;
     String estado;
     Long valor;
+    Date fecha;
     Cliente cliente;
     Shipping shipping;
     List<DetalleVenta> listaProductos;

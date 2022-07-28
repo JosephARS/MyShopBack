@@ -3,9 +3,10 @@ package com.payu.myshop.ventasms.domain.usecases;
 import com.payu.myshop.ventasms.domain.models.dto.*;
 import com.payu.myshop.ventasms.domain.models.endpoints.ClienteDetailResponse;
 import com.payu.myshop.ventasms.domain.models.endpoints.ResponseWS;
-import com.payu.myshop.ventasms.domain.ports.repositories.*;
+import com.payu.myshop.ventasms.domain.ports.repositories.VentaRepositoryPort;
 import com.payu.myshop.ventasms.domain.ports.services.VentaService;
 import com.payu.myshop.ventasms.infrastructure.db.entities.*;
+import com.payu.myshop.ventasms.infrastructure.db.repository.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -13,11 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -25,7 +24,7 @@ import java.util.stream.Stream;
 @Slf4j
 public class VentaServiceImpl implements VentaService {
 
-    VentaRepository ventaRepository;
+    VentaRepositoryPort ventaRepository;
     DetalleVentaRepository detalleVentaRepository;
     ShippingRepository shippingRepository;
     ClienteRepository clienteRepository;
@@ -33,10 +32,10 @@ public class VentaServiceImpl implements VentaService {
 
     @Override
     @Transactional
-    public ResponseWS confirmarVenta(Venta request) {
+    public ResponseWS confirmarVenta(Venta request, String idToken, String maskedCardNumber, String franquicia) {
 
         ResponseWS oResponseWS = new ResponseWS();
-
+        System.out.println("VentaServiceImpl.confirmarVenta" + idToken + maskedCardNumber + franquicia);
         try{
             ClienteEntity cliente = new ClienteEntity();
 
@@ -61,23 +60,34 @@ public class VentaServiceImpl implements VentaService {
                             .cliente(cliente)
                     .build());
 
-            VentaEntity venta = ventaRepository.save(VentaEntity.builder()
-                            .cliente(cliente)
-                            .shipping(shipping)
-                            .estado(request.getEstado())
-                            .fecha(new Date())
-                            .idPago(request.getIdPago())
-                            .precio(request.getValor())
-                    .build());
+            request.setCliente(cliente.toDto());
+            request.setShipping(shipping.toDto());
+
+            Venta venta = ventaRepository.saveVenta(request);
 
             request.getListaProductos().forEach(producto -> {
                 detalleVentaRepository.save(DetalleVentaEntity.builder()
-                                .venta(venta)
+                                .venta(new VentaEntity(venta))
                                 .cantidad(producto.getCantidadCompra())
                                 .precio(producto.getPrecio())
                                 .idInventario(producto.getIdInventario())
                         .build());
             });
+
+            if (idToken != null) {
+
+                List<CardEntity> cardList = cardRepository.findByCliente(cliente);
+                Optional<CardEntity> cardResult = cardList.stream().filter(card -> card.getCreditCard().equalsIgnoreCase(maskedCardNumber)).findFirst();
+                System.out.println("cardResult = " + cardResult);
+                if (cardResult.isEmpty()){
+                    cardRepository.save(CardEntity.builder()
+                                    .token(idToken)
+                                    .franquicia(franquicia)
+                                    .creditCard(maskedCardNumber)
+                                    .cliente(cliente)
+                            .build());
+                }
+            }
 
             oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
             oResponseWS.setResultado(venta);
@@ -98,15 +108,7 @@ public class VentaServiceImpl implements VentaService {
         List<Object> oVentasList = new ArrayList<Object>();
 
         try {
-           oVentasList = ventaRepository.findAll().stream().map(v -> VentaEntity.builder()
-                   .idVenta(v.getIdVenta())
-                   .idPago(v.getIdPago())
-                   .precio(v.getPrecio())
-                   .fecha(v.getFecha())
-                   .estado(v.getEstado())
-                   .shipping(v.getShipping())
-                   .cliente(v.getCliente())
-                   .build()).collect(Collectors.toList());;
+           oVentasList = ventaRepository.findAllVentas();
 
             oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
             oResponseWS.setListaResultado(oVentasList);
@@ -125,8 +127,10 @@ public class VentaServiceImpl implements VentaService {
         ResponseWS oResponseWS = new ResponseWS();
 
         try{
-            Optional<VentaEntity> ventaToUpdate = ventaRepository.findById(request.getIdVenta());
-            List<DetalleVenta> oDetalleVenta = detalleVentaRepository.findByVenta(ventaToUpdate.get()).stream()
+            Venta ventaToUpdate = ventaRepository.updateRefund(request.getIdVenta());
+
+
+            List<DetalleVenta> oDetalleVenta = detalleVentaRepository.findByVenta(new VentaEntity(ventaToUpdate)).stream()
                     .map(p -> DetalleVenta.builder()
                             .idDetalleVenta(p.getIdDetalleVenta())
                             .cantidadCompra(p.getCantidad())
@@ -134,9 +138,6 @@ public class VentaServiceImpl implements VentaService {
                             .idInventario(p.getIdInventario())
                             .build())
                     .collect(Collectors.toList());
-
-            ventaToUpdate.get().setEstado(State.REFUND.toString());
-            ventaRepository.save(ventaToUpdate.get());
 
             oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
             oResponseWS.setListaResultado(Arrays.asList(oDetalleVenta.toArray()));
