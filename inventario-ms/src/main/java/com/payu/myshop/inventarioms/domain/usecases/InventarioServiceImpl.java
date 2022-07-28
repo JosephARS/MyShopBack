@@ -1,13 +1,11 @@
 package com.payu.myshop.inventarioms.domain.usecases;
 
+import com.payu.myshop.inventarioms.domain.models.dto.TipoRespuesta;
 import com.payu.myshop.inventarioms.domain.models.endpoints.Inventario;
 import com.payu.myshop.inventarioms.domain.models.endpoints.ProductDetailResponse;
 import com.payu.myshop.inventarioms.domain.models.endpoints.ResponseWS;
-import com.payu.myshop.inventarioms.domain.models.dto.TipoRespuesta;
 import com.payu.myshop.inventarioms.domain.ports.repositories.InventarioRepositoryPort;
 import com.payu.myshop.inventarioms.domain.ports.services.InventarioService;
-import com.payu.myshop.inventarioms.infrastructure.db.entities.InventarioEntity;
-import com.payu.myshop.inventarioms.infrastructure.db.repository.InventarioRepository;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,6 +47,7 @@ public class InventarioServiceImpl implements InventarioService {
     }
 
     @Override
+
     public ResponseWS getProductList() {
 
         ResponseWS oResponseWS = new ResponseWS();
@@ -71,6 +69,7 @@ public class InventarioServiceImpl implements InventarioService {
         }
         return oResponseWS;
     }
+
 
     @Override
     public ResponseWS getProductById(Long idInventario) {

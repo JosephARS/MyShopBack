@@ -5,8 +5,8 @@ import com.payu.myshop.inventarioms.domain.models.endpoints.Inventario;
 import com.payu.myshop.inventarioms.domain.ports.repositories.InventarioRepositoryPort;
 import com.payu.myshop.inventarioms.infrastructure.db.entities.InventarioEntity;
 import com.payu.myshop.inventarioms.infrastructure.db.repository.InventarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,10 +15,13 @@ import java.util.stream.Collectors;
 @Repository("inventarioRepositoryPort")
 public class InventarioPersistance implements InventarioRepositoryPort {
 
-    @Autowired
     InventarioRepository inventarioRepository;
 
+    public InventarioPersistance(InventarioRepository inventarioRepository) {
+        this.inventarioRepository = inventarioRepository;
+    }
     @Override
+    @Transactional
     public Inventario save(Inventario producto) {
         InventarioEntity inventario = inventarioRepository.save(InventarioEntity.builder()
                 .nombre(producto.getNombre())
@@ -50,6 +53,8 @@ public class InventarioPersistance implements InventarioRepositoryPort {
                 .activo(product.getActivo())
                 .build()).collect(Collectors.toList());
     }
+
+
     @Override
     public Inventario findById(Long idInventario) {
         return inventarioRepository.findById(idInventario).map(product -> Inventario.builder()
@@ -64,6 +69,7 @@ public class InventarioPersistance implements InventarioRepositoryPort {
     }
 
     @Override
+    @Transactional
     public Inventario updateProduct(Inventario producto) {
 
         Optional<InventarioEntity> productToUpdate = inventarioRepository.findById(producto.getIdInventario());
@@ -104,6 +110,7 @@ public class InventarioPersistance implements InventarioRepositoryPort {
     }
 
     @Override
+    @Transactional
     public void updateStock(List<Inventario> listaProductos, String accion) {
 
         listaProductos.forEach(producto ->{
