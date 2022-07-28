@@ -10,14 +10,8 @@ spring:
   cloud:
     gateway:
       globalcors:
-        corsConfigurations:
-          '[/**]':
-            allowedOrigins: "http://localhost:4200"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
+        add-to-simple-url-handler-mapping: true
+
       discovery:
         locator:
           enabled: true
