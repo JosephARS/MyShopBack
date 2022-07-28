@@ -3,10 +3,14 @@ config-server:
   port: 8081
 
 spring:
+  cloud:
+    config:
+      username: root
+      password: s3cr3t
   application:
-    name: inventario-ms
+    name: transactional-ms
   config:
-    name: inventario-ms
+    name: transactional-ms
     import: optional:configserver:http://${config-server.hostname}:${config-server.port}
 
 #server:

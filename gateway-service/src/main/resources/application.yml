@@ -1,6 +1,10 @@
 
 
 spring:
+  cloud:
+    config:
+      username: root
+      password: s3cr3t
   application:
     name: gateway-service
   config:

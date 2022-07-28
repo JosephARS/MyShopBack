@@ -13,3 +13,7 @@ spring:
           skip-ssl-validation: true
           username: JosephARS
           password: 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
+  security:
+    user:
+      name: root
+      password: s3cr3t
