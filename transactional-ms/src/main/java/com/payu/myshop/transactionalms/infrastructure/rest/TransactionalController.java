@@ -15,7 +15,7 @@ import javax.validation.Valid;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("/payment")
+@RequestMapping("/transactional")
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Slf4j
@@ -27,7 +27,7 @@ public class TransactionalController {
 
     TransactionalService transactionalService;
 
-    @PostMapping(path = "/")
+    @PostMapping(path = "/payment")
     public ResponseWS authorizePayment(@Valid @RequestBody AuthorizePaymentRequest request,
                                        @RequestParam(value = "withToken") Boolean withToken){
         if (withToken) {

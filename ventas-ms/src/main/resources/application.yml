@@ -19,7 +19,7 @@ spring:
     hibernate:
       ddl-auto: update
   application:
-    name: ventas-ws
+    name: ventas-ms
 
   # ===============================
   # DB

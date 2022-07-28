@@ -19,7 +19,7 @@ spring:
     hibernate:
       ddl-auto: update
   application:
-    name: transactional-ws
+    name: transactional-ms
 
   # ===============================
   # DB

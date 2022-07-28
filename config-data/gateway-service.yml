@@ -1,0 +1,27 @@
+server:
+  port: 8000
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8099/eureka
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: inventario-ms
+          uri: lb://inventario-ms
+          predicates:
+            - Path=/inventario/**
+        - id: ventas-ms
+          uri: lb://ventas-ms
+          predicates:
+            - Path=/ventas/**
+        - id: transactional-ms
+          uri: lb://transactional-ms
+          predicates:
+            - Path=/transactional/**
