@@ -1,5 +1,7 @@
 package com.payu.myshop.transactionalms.infrastructure.db.entities;
 
+import com.payu.myshop.transactionalms.domain.models.dto.Pago;
+import com.payu.myshop.transactionalms.domain.models.dto.Transaccion;
 import lombok.*;
 
 import javax.persistence.*;
@@ -49,4 +51,35 @@ public class TransaccionesEntity implements Serializable {
 
     @ManyToOne(optional = false) @JoinColumn(name = "idPago")
     PagosEntity pago;
+
+
+    public TransaccionesEntity(Transaccion transaccion) {
+        idTransaccion = transaccion.getIdTransaccion();
+        payuTransaccionId = transaccion.getPayuTransaccionId();
+        fecha = transaccion.getFecha();
+        state = transaccion.getState();
+        codeResponde = transaccion.getCodeResponde();
+        networkResponseCode = transaccion.getNetworkResponseCode();
+        authorizationCode = transaccion.getAuthorizationCode();
+        responseMessage = transaccion.getResponseMessage();
+        rejectionType = transaccion.getRejectionType();
+        transactionType = transaccion.getTransactionType();
+        pago = new PagosEntity(transaccion.getPago());
+    }
+
+    public Transaccion toDto(){
+        return Transaccion.builder()
+                .idTransaccion(idTransaccion)
+                .payuTransaccionId(payuTransaccionId)
+                .fecha(fecha)
+                .state(state)
+                .codeResponde(codeResponde)
+                .networkResponseCode(networkResponseCode)
+                .authorizationCode(authorizationCode)
+                .responseMessage(responseMessage)
+                .rejectionType(rejectionType)
+                .transactionType(transactionType)
+                .pago(pago.toDto())
+                .build();
+    }
 }

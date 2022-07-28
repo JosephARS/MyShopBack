@@ -1,5 +1,6 @@
 package com.payu.myshop.transactionalms.infrastructure.db.entities;
 
+import com.payu.myshop.transactionalms.domain.models.dto.Pago;
 import lombok.*;
 
 import javax.persistence.*;
@@ -59,4 +60,37 @@ public class PagosEntity implements Serializable {
     @Column(name = "estadoPago")
     String estadoPago;
 
+
+    public PagosEntity(Pago pago) {
+        idPago = pago.getIdPago();
+        payuOrdenId = pago.getPayuOrdenId();
+        fecha = pago.getFecha();
+        dniPayer = pago.getDniPayer();
+        dniBuyer = pago.getDniBuyer();
+        valor = pago.getValor();
+        direccion = pago.getDireccion();
+        ciudad = pago.getCiudad();
+        pais = pago.getPais();
+        metodoPago = pago.getMetodoPago();
+        franquicia =pago.getFranquicia();
+        estadoPago = pago.getEstadoPago();
+
+    }
+
+    public Pago toDto(){
+        return Pago.builder()
+                .idPago(idPago)
+                .payuOrdenId(payuOrdenId)
+                .fecha(fecha)
+                .dniPayer(dniPayer)
+                .dniBuyer(dniBuyer)
+                .valor(valor)
+                .direccion(direccion)
+                .ciudad(ciudad)
+                .pais(pais)
+                .metodoPago(metodoPago)
+                .franquicia(franquicia)
+                .estadoPago(estadoPago)
+                .build();
+    }
 }

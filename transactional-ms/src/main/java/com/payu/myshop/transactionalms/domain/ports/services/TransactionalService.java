@@ -1,5 +1,8 @@
 package com.payu.myshop.transactionalms.domain.ports.services;
 
+import com.payu.myshop.transactionalms.domain.models.dto.Pago;
+import com.payu.myshop.transactionalms.domain.models.dto.ResponsePaymentPayu;
+import com.payu.myshop.transactionalms.domain.models.dto.Transaccion;
 import com.payu.myshop.transactionalms.domain.models.endpoints.AuthorizePaymentRequest;
 import com.payu.myshop.transactionalms.domain.models.endpoints.RefundRequest;
 import com.payu.myshop.transactionalms.domain.models.endpoints.ResponseWS;
@@ -12,8 +15,6 @@ public interface TransactionalService {
 
     ResponseWS refundPayment(RefundRequest request);
 
-    String createSignature(String parametros) ;
-
-    ResponseWS getPaymentList();
+    ResponseWS authorizePaymentWithToken(AuthorizePaymentRequest request);
 
 }

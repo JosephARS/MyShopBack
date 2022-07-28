@@ -16,6 +16,8 @@ public class AuthorizePaymentResponse {
     Long pagoId;
     String state;
     Long orderId;
+    String creditCardTokenId;
+    String maskedCardNumber;
     String transactionId;
     String authorizationCode;
     String networkResponseCode;

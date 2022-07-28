@@ -16,26 +16,29 @@ import javax.validation.Valid;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/payment")
-@AllArgsConstructor
+
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Slf4j
 public class TransactionalController {
 
-    @Autowired
+    public TransactionalController(TransactionalService transactionalService) {
+        this.transactionalService = transactionalService;
+    }
+
     TransactionalService transactionalService;
 
     @PostMapping(path = "/")
-    public ResponseWS authorizePayment(@Valid @RequestBody AuthorizePaymentRequest request){
-        return transactionalService.authorizePayment(request);
+    public ResponseWS authorizePayment(@Valid @RequestBody AuthorizePaymentRequest request,
+                                       @RequestParam(value = "withToken") Boolean withToken){
+        if (withToken) {
+            return transactionalService.authorizePaymentWithToken(request);
+        }else {
+            return transactionalService.authorizePayment(request);
+        }
     }
-
     @PostMapping(path = "/refund")
     public ResponseWS refundPayment(@Valid @RequestBody RefundRequest request){
         return transactionalService.refundPayment(request);
     }
 
-    @GetMapping(path = "/")
-    public ResponseWS getPaymentList(){
-        return transactionalService.getPaymentList();
-    }
 }

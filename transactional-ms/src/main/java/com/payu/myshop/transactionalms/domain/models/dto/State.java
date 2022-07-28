@@ -1,4 +1,4 @@
-package com.payu.myshop.ventasms.domain.models.dto;
+package com.payu.myshop.transactionalms.domain.models.dto;
 
 public enum State {
 
