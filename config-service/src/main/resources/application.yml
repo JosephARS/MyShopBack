@@ -1,0 +1,15 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/JosephARS/MyShopBack.git
+          search-paths: config-data
+          skip-ssl-validation: true
+          username: JosephARS
+          password: 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
