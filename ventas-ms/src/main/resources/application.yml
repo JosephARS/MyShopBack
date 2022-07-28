@@ -1,31 +1,43 @@
-server:
-  port: ${PORT:52}
-
-database:
+config-server:
   hostname: localhost
-  name: ventas
-  port: 3306
-
-#config-server:
-#  hostname: localhost
-#  port: 8081
+  port: 8081
 
 spring:
-  # ===============================
-  # JPA / HIBERNATE
-  jpa:
-    database: mysql
-    show-sql: true
-    hibernate:
-      ddl-auto: update
   application:
     name: ventas-ms
+  config:
+    name: ventas-ms
+    import: optional:configserver:http://${config-server.hostname}:${config-server.port}
 
-  # ===============================
-  # DB
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${database.hostname}:${database.port}/${database.name}?autoReconnect=true&serverTimezone=America/Bogota&nullCatalogMeansCurrent=true
-    username: root
-    password: mypass
 
+#server:
+#  port: ${PORT:52}
+#
+#database:
+#  hostname: localhost
+#  name: ventas
+#  port: 3306
+#
+##config-server:
+##  hostname: localhost
+##  port: 8081
+#
+#spring:
+#  # ===============================
+#  # JPA / HIBERNATE
+#  jpa:
+#    database: mysql
+#    show-sql: true
+#    hibernate:
+#      ddl-auto: update
+#  application:
+#    name: ventas-ms
+#
+#  # ===============================
+#  # DB
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://${database.hostname}:${database.port}/${database.name}?autoReconnect=true&serverTimezone=America/Bogota&nullCatalogMeansCurrent=true
+#    username: root
+#    password: mypass
+#

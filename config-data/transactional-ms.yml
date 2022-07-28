@@ -1,0 +1,100 @@
+server:
+  port: ${PORT:51}
+
+database:
+  hostname: localhost
+  name: payment
+  port: 3306
+
+spring:
+  # ===============================
+  # JPA / HIBERNATE
+  jpa:
+    database: mysql
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  application:
+    name: transactional-ms
+
+  # ===============================
+  # DB
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${database.hostname}:${database.port}/${database.name}?autoReconnect=true&serverTimezone=America/Bogota&nullCatalogMeansCurrent=true
+    username: root
+    password: mypass
+
+  config:
+    import: variables.yml
+
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
+
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      paymentService:
+        registerHealthIndicator: true
+        eventConsumerBufferSize: 10
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+      refundService:
+        registerHealthIndicator: true
+        eventConsumerBufferSize: 10
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+      paymentTokenService:
+        registerHealthIndicator: true
+        eventConsumerBufferSize: 10
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+
+
+  retry:
+    instances:
+      paymentService:
+        maxRetryAttempts: 3
+        waitDuration: 10s
+      refundService:
+        maxRetryAttempts: 3
+        waitDuration: 10s
+      paymentTokenService:
+        maxRetryAttempts: 3
+        waitDuration: 10s
+
+
+registry-service:
+  hostname: localhost
+  port: 8099
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${registry-service.hostname}:${registry-service.port}/eureka

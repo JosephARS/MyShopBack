@@ -1,94 +1,105 @@
-server:
-  port: ${PORT:51}
-
-database:
+config-server:
   hostname: localhost
-  name: payment
-  port: 3306
-
-#config-server:
-#  hostname: localhost
-#  port: 8081
+  port: 8081
 
 spring:
-  # ===============================
-  # JPA / HIBERNATE
-  jpa:
-    database: mysql
-    show-sql: false
-    hibernate:
-      ddl-auto: update
   application:
-    name: transactional-ms
-
-  # ===============================
-  # DB
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${database.hostname}:${database.port}/${database.name}?autoReconnect=true&serverTimezone=America/Bogota&nullCatalogMeansCurrent=true
-    username: root
-    password: mypass
-
+    name: inventario-ms
   config:
-    import: variables.yml
+    name: inventario-ms
+    import: optional:configserver:http://${config-server.hostname}:${config-server.port}
 
-
-management:
-  health:
-    circuitbreakers:
-      enabled: true
-  endpoints:
-    web:
-      exposure:
-        include: health
-  endpoint:
-    health:
-      show-details: always
-
-
-resilience4j:
-  circuitbreaker:
-    instances:
-      paymentService:
-        registerHealthIndicator: true
-        eventConsumerBufferSize: 10
-        failureRateThreshold: 50
-        minimumNumberOfCalls: 5
-        automaticTransitionFromOpenToHalfOpenEnabled: true
-        waitDurationInOpenState: 10s
-        permittedNumberOfCallsInHalfOpenState: 3
-        slidingWindowSize: 10
-        slidingWindowType: COUNT_BASED
-      refundService:
-        registerHealthIndicator: true
-        eventConsumerBufferSize: 10
-        failureRateThreshold: 50
-        minimumNumberOfCalls: 5
-        automaticTransitionFromOpenToHalfOpenEnabled: true
-        waitDurationInOpenState: 10s
-        permittedNumberOfCallsInHalfOpenState: 3
-        slidingWindowSize: 10
-        slidingWindowType: COUNT_BASED
-      paymentTokenService:
-        registerHealthIndicator: true
-        eventConsumerBufferSize: 10
-        failureRateThreshold: 50
-        minimumNumberOfCalls: 5
-        automaticTransitionFromOpenToHalfOpenEnabled: true
-        waitDurationInOpenState: 10s
-        permittedNumberOfCallsInHalfOpenState: 3
-        slidingWindowSize: 10
-        slidingWindowType: COUNT_BASED
-
-
-  retry:
-    instances:
-      paymentService:
-        maxRetryAttempts: 3
-        waitDuration: 10s
-      refundService:
-        maxRetryAttempts: 3
-        waitDuration: 10s
-      paymentTokenService:
-        maxRetryAttempts: 3
-        waitDuration: 10s
+#server:
+#  port: ${PORT:51}
+#
+#database:
+#  hostname: localhost
+#  name: payment
+#  port: 3306
+#
+##config-server:
+##  hostname: localhost
+##  port: 8081
+#
+#spring:
+#  # ===============================
+#  # JPA / HIBERNATE
+#  jpa:
+#    database: mysql
+#    show-sql: false
+#    hibernate:
+#      ddl-auto: update
+#  application:
+#    name: transactional-ms
+#
+#  # ===============================
+#  # DB
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://${database.hostname}:${database.port}/${database.name}?autoReconnect=true&serverTimezone=America/Bogota&nullCatalogMeansCurrent=true
+#    username: root
+#    password: mypass
+#
+#  config:
+#    import: variables.yml
+#
+#
+#management:
+#  health:
+#    circuitbreakers:
+#      enabled: true
+#  endpoints:
+#    web:
+#      exposure:
+#        include: health
+#  endpoint:
+#    health:
+#      show-details: always
+#
+#
+#resilience4j:
+#  circuitbreaker:
+#    instances:
+#      paymentService:
+#        registerHealthIndicator: true
+#        eventConsumerBufferSize: 10
+#        failureRateThreshold: 50
+#        minimumNumberOfCalls: 5
+#        automaticTransitionFromOpenToHalfOpenEnabled: true
+#        waitDurationInOpenState: 10s
+#        permittedNumberOfCallsInHalfOpenState: 3
+#        slidingWindowSize: 10
+#        slidingWindowType: COUNT_BASED
+#      refundService:
+#        registerHealthIndicator: true
+#        eventConsumerBufferSize: 10
+#        failureRateThreshold: 50
+#        minimumNumberOfCalls: 5
+#        automaticTransitionFromOpenToHalfOpenEnabled: true
+#        waitDurationInOpenState: 10s
+#        permittedNumberOfCallsInHalfOpenState: 3
+#        slidingWindowSize: 10
+#        slidingWindowType: COUNT_BASED
+#      paymentTokenService:
+#        registerHealthIndicator: true
+#        eventConsumerBufferSize: 10
+#        failureRateThreshold: 50
+#        minimumNumberOfCalls: 5
+#        automaticTransitionFromOpenToHalfOpenEnabled: true
+#        waitDurationInOpenState: 10s
+#        permittedNumberOfCallsInHalfOpenState: 3
+#        slidingWindowSize: 10
+#        slidingWindowType: COUNT_BASED
+#
+#
+#  retry:
+#    instances:
+#      paymentService:
+#        maxRetryAttempts: 3
+#        waitDuration: 10s
+#      refundService:
+#        maxRetryAttempts: 3
+#        waitDuration: 10s
+#      paymentTokenService:
+#        maxRetryAttempts: 3
+#        waitDuration: 10s
