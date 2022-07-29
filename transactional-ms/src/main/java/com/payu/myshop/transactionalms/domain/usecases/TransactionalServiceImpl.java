@@ -55,6 +55,7 @@ public class TransactionalServiceImpl implements TransactionalService {
             RequestPaymentPayu requestPaymentPayu = sampleFactory.requestPaymentPayu(request);
 
             String urlString = env.getProperty("payuAPI.url");
+        System.out.println(urlString);
             HttpEntity<RequestPaymentPayu> httpEntity = new HttpEntity<>(requestPaymentPayu);
             ResponseEntity<ResponsePaymentPayu> result = restTemplate.postForEntity(urlString, httpEntity, ResponsePaymentPayu.class);
             log.info("Response ws: AuthorizePaymentRequest: " + " dniBuyer: " + request.getBuyer().getDniNumber()  + result.getBody().toString());
@@ -79,7 +80,8 @@ public class TransactionalServiceImpl implements TransactionalService {
         ResponseWS oResponseWS = new ResponseWS();
         oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
         oResponseWS.setMensaje("Service offline " + e.getMessage());
-        //log.error("Error authorizing payment: " +  "dniBuyer: " + request.getBuyer().getDniNumber()+ " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
+      //  log.error("Error authorizing payment: " +  "dniBuyer: " + request.getBuyer().getDniNumber()+ " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
+        log.error("Error authorizing payment: " +  "dniBuyer: " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
         return oResponseWS;
     }
 

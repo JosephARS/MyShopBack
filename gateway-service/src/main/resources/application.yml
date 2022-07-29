@@ -5,8 +5,18 @@ spring:
     config:
       username: root
       password: s3cr3t
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
   application:
     name: gateway-service
   config:
     name: gateway-service
     import: optional:configserver:http://localhost:8081
+
