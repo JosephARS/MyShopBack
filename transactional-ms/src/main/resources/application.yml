@@ -26,6 +26,18 @@ spring:
 ##  port: 8081
 #
 #spring:
+#  config:
+#    name: transactional-ms
+#    import: optional:configserver:http://${config-server.hostname}:${config-server.port}
+#  cloud:
+#    config:
+#      username: root
+#      password: s3cr3t
+#      fail-fast: true
+#      retry:
+#        maxAttempts: 200
+#        maxInterval: 10000
+#      uri: http://localhost:8081
 #  # ===============================
 #  # JPA / HIBERNATE
 #  jpa:
@@ -44,9 +56,6 @@ spring:
 #    username: root
 #    password: mypass
 #
-#  config:
-#    import: variables.yml
-#
 #
 #management:
 #  health:
@@ -59,8 +68,8 @@ spring:
 #  endpoint:
 #    health:
 #      show-details: always
-#
-#
+
+
 
 payuAPI:
   language: "es"
