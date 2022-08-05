@@ -1,21 +1,21 @@
 package com.payu.myshop.inventarioms.domain.ports.services;
 
-import com.payu.myshop.inventarioms.domain.models.endpoints.Inventario;
-import com.payu.myshop.inventarioms.domain.models.endpoints.ResponseWS;
+import com.payu.myshop.inventarioms.domain.models.dto.Inventario;
+import com.payu.myshop.inventarioms.domain.models.endpoints.ResponseWsInventario;
 
 import java.util.List;
 
 public interface InventarioService {
 
-    ResponseWS createProduct(Inventario request);
+    ResponseWsInventario createProduct(Inventario request);
 
-    ResponseWS getProductList();
+    ResponseWsInventario getProductList();
 
-    ResponseWS getProductById(Long idInventario);
+    ResponseWsInventario getProductById(Long idInventario);
 
-    ResponseWS updateProduct(Inventario request);
+    ResponseWsInventario updateProduct(Inventario request);
 
-    ResponseWS deleteProduct(Long idInventario);
+    ResponseWsInventario deleteProduct(Long idInventario);
 
-    ResponseWS updateStock(List<Inventario> listaProductos, String accion);
+    ResponseWsInventario updateStock(List<Inventario> listaProductos, String accion, Long idVenta);
 }

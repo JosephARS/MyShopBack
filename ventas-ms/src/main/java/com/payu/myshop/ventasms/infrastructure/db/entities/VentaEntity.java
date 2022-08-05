@@ -28,7 +28,7 @@ public class VentaEntity implements Serializable {
     @ManyToOne(optional = false) @JoinColumn(name = "idCliente")
     ClienteEntity cliente;
 
-    @OneToOne(optional = false) @JoinColumn(name = "idShipping")
+    @ManyToOne(optional = false) @JoinColumn(name = "idShipping")
     ShippingEntity shipping;
 
     Long idPago;
@@ -47,13 +47,13 @@ public class VentaEntity implements Serializable {
 
     public Venta toDto(){
         return Venta.builder()
-                .idVenta(idVenta)
-                .cliente(cliente.toDto())
-                .fecha(fecha)
-                .idPago(idPago)
-                .valor(valor)
-                .estado(estado)
-                .shipping(shipping.toDto())
+                    .idVenta(idVenta)
+                    .cliente(cliente.toDto())
+                    .fecha(fecha)
+                    .idPago(idPago)
+                    .valor(valor)
+                    .estado(estado)
+                    .shipping(shipping.toDto())
                 .build();
     }
 

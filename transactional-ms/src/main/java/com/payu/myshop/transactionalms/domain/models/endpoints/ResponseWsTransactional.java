@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseWS {
+public class ResponseWsTransactional {
 
     private TipoRespuesta tipoRespuesta;	//Enumerador: Puede ser Exito o error.
     private String mensaje = "";

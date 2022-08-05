@@ -1,12 +1,23 @@
 package com.payu.myshop.ventasms.domain.usecases;
 
-import com.payu.myshop.ventasms.domain.models.dto.*;
+import com.payu.myshop.ventasms.domain.models.dto.Card;
+import com.payu.myshop.ventasms.domain.models.dto.Cliente;
+import com.payu.myshop.ventasms.domain.models.dto.DetalleVenta;
+import com.payu.myshop.ventasms.domain.models.dto.Shipping;
+import com.payu.myshop.ventasms.domain.models.dto.TipoRespuesta;
+import com.payu.myshop.ventasms.domain.models.dto.Venta;
 import com.payu.myshop.ventasms.domain.models.endpoints.ClienteDetailResponse;
-import com.payu.myshop.ventasms.domain.models.endpoints.ResponseWS;
+import com.payu.myshop.ventasms.domain.models.endpoints.ResponseWsVentas;
 import com.payu.myshop.ventasms.domain.ports.repositories.VentaRepositoryPort;
 import com.payu.myshop.ventasms.domain.ports.services.VentaService;
-import com.payu.myshop.ventasms.infrastructure.db.entities.*;
-import com.payu.myshop.ventasms.infrastructure.db.repository.*;
+import com.payu.myshop.ventasms.infrastructure.db.entities.CardEntity;
+import com.payu.myshop.ventasms.infrastructure.db.entities.ClienteEntity;
+import com.payu.myshop.ventasms.infrastructure.db.entities.ShippingEntity;
+import com.payu.myshop.ventasms.infrastructure.db.entities.VentaEntity;
+import com.payu.myshop.ventasms.infrastructure.db.repository.CardRepository;
+import com.payu.myshop.ventasms.infrastructure.db.repository.ClienteRepository;
+import com.payu.myshop.ventasms.infrastructure.db.repository.DetalleVentaRepository;
+import com.payu.myshop.ventasms.infrastructure.db.repository.ShippingRepository;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -15,50 +26,44 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ *
+ */
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 @Slf4j
 public class VentaServiceImpl implements VentaService {
 
+    SampleFactory sampleFactory;
     VentaRepositoryPort ventaRepository;
     DetalleVentaRepository detalleVentaRepository;
     ShippingRepository shippingRepository;
     ClienteRepository clienteRepository;
     CardRepository cardRepository;
 
+    /**
+     * @param request - Request object with the Sale data to save
+     * @param idToken - Credit card's token (if exists)
+     * @param maskedCardNumber - Credit card's number related to token (if exists)
+     * @param franquicia - Credit card's type (if exists)
+     * @return
+     */
     @Override
     @Transactional
-    public ResponseWS confirmarVenta(Venta request, String idToken, String maskedCardNumber, String franquicia) {
+    public ResponseWsVentas confirmSale(Venta request, String idToken, String maskedCardNumber, String franquicia) {
 
-        ResponseWS oResponseWS = new ResponseWS();
-        System.out.println("VentaServiceImpl.confirmarVenta" + idToken + maskedCardNumber + franquicia);
+        ResponseWsVentas oResponseWsVentas = new ResponseWsVentas();
+
         try{
-            ClienteEntity cliente = new ClienteEntity();
-
-            if (request.getCliente().getIdCliente() == null){
-                cliente  = clienteRepository.save(ClienteEntity.builder()
-                        .nombre(request.getCliente().getNombre())
-                        .apellido(request.getCliente().getApellido())
-                        .dni(request.getCliente().getDni())
-                        .email(request.getCliente().getEmail())
-                        .telefono(request.getCliente().getTelefono())
-                        .build());
-            }else{
-                cliente = clienteRepository.findById(request.getCliente().getIdCliente()).get();
-            }
-
-            ShippingEntity shipping = shippingRepository.save(ShippingEntity.builder()
-                            .direccion(request.getShipping().getDireccion())
-                            .ciudad(request.getShipping().getCiudad())
-                            .departamento(request.getShipping().getDepartamento())
-                            .pais(request.getShipping().getPais())
-                            .postalCode(request.getShipping().getPostalCode())
-                            .cliente(cliente)
-                    .build());
+            ClienteEntity cliente = saveClient(request.getCliente());
+            ShippingEntity shipping = saveShipping(request, cliente);
 
             request.setCliente(cliente.toDto());
             request.setShipping(shipping.toDto());
@@ -66,137 +71,164 @@ public class VentaServiceImpl implements VentaService {
             Venta venta = ventaRepository.saveVenta(request);
 
             request.getListaProductos().forEach(producto -> {
-                detalleVentaRepository.save(DetalleVentaEntity.builder()
-                                .venta(new VentaEntity(venta))
-                                .cantidad(producto.getCantidadCompra())
-                                .precio(producto.getPrecio())
-                                .idInventario(producto.getIdInventario())
-                        .build());
+                detalleVentaRepository.save(sampleFactory.detalleVentaFactory(venta, producto));
             });
 
             if (idToken != null) {
-
-                List<CardEntity> cardList = cardRepository.findByCliente(cliente);
-                Optional<CardEntity> cardResult = cardList.stream().filter(card -> card.getCreditCard().equalsIgnoreCase(maskedCardNumber)).findFirst();
-                System.out.println("cardResult = " + cardResult);
-                if (cardResult.isEmpty()){
-                    cardRepository.save(CardEntity.builder()
-                                    .token(idToken)
-                                    .franquicia(franquicia)
-                                    .creditCard(maskedCardNumber)
-                                    .cliente(cliente)
-                            .build());
-                }
+                saveCard(idToken,franquicia,maskedCardNumber,cliente);
             }
 
-            oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
-            oResponseWS.setResultado(venta);
+            oResponseWsVentas.setTipoRespuesta(TipoRespuesta.Exito);
+            oResponseWsVentas.setResultado(venta);
 
         }catch (Exception e){
-            oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
-            oResponseWS.setMensaje(e.getMessage() );
-            log.error("Error confirmando venta " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
+            oResponseWsVentas.setTipoRespuesta(TipoRespuesta.Error);
+            oResponseWsVentas.setMensaje(e.getMessage() );
+            log.error("Error confirmando venta " + " | " + "IdVenta:" + request.getIdPago() + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
         }
 
-        return oResponseWS;
+        return oResponseWsVentas;
     }
 
     @Override
-    public ResponseWS consultarVentas() {
+    public ResponseWsVentas getSales() {
 
-        ResponseWS oResponseWS = new ResponseWS();
-        List<Object> oVentasList = new ArrayList<Object>();
+        ResponseWsVentas oResponseWsVentas = new ResponseWsVentas();
+        List<Object> oVentasList = new ArrayList<>();
 
         try {
            oVentasList = ventaRepository.findAllVentas();
 
-            oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
-            oResponseWS.setListaResultado(oVentasList);
+            oResponseWsVentas.setTipoRespuesta(TipoRespuesta.Exito);
+            oResponseWsVentas.setListaResultado(oVentasList);
 
         } catch (Exception e){
-            oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
-            oResponseWS.setMensaje( e.getMessage() );
+            oResponseWsVentas.setTipoRespuesta(TipoRespuesta.Error);
+            oResponseWsVentas.setMensaje( e.getMessage() );
             log.error("Error consultando ventas " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
         }
-        return oResponseWS;
+        return oResponseWsVentas;
     }
 
     @Override
-    public ResponseWS anularVenta(Venta request) {
+    public ResponseWsVentas refundSale(Venta request) {
 
-        ResponseWS oResponseWS = new ResponseWS();
-
+        ResponseWsVentas oResponseWsVentas = new ResponseWsVentas();
+        Venta ventaToUpdate = new Venta();
         try{
-            Venta ventaToUpdate = ventaRepository.updateRefund(request.getIdVenta());
+            ventaToUpdate = ventaRepository.updateRefund(request.getIdVenta());
 
+            List<DetalleVenta> oDetalleVentaList = getDetalleVenta(ventaToUpdate);
 
-            List<DetalleVenta> oDetalleVenta = detalleVentaRepository.findByVenta(new VentaEntity(ventaToUpdate)).stream()
-                    .map(p -> DetalleVenta.builder()
-                            .idDetalleVenta(p.getIdDetalleVenta())
-                            .cantidadCompra(p.getCantidad())
-                            .precio(p.getPrecio())
-                            .idInventario(p.getIdInventario())
-                            .build())
-                    .collect(Collectors.toList());
-
-            oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
-            oResponseWS.setListaResultado(Arrays.asList(oDetalleVenta.toArray()));
+            oResponseWsVentas.setTipoRespuesta(TipoRespuesta.Exito);
+            oResponseWsVentas.setListaResultado(Arrays.asList(oDetalleVentaList.toArray()));
 
         } catch (Exception e){
-            oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
-            oResponseWS.setMensaje( e.getMessage() );
-            log.error("Error anulando venta " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
+            oResponseWsVentas.setTipoRespuesta(TipoRespuesta.Error);
+            oResponseWsVentas.setMensaje( e.getMessage() );
+            log.error("Error anulando venta " + " | " + "IdVenta:" + ventaToUpdate.getIdPago() + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
         }
-        return oResponseWS;
+        return oResponseWsVentas;
     }
 
     @Override
-    public ResponseWS consultarUsuario(String email) {
+    public ResponseWsVentas getUser(String email) {
 
-        ResponseWS oResponseWS = new ResponseWS();
+        ResponseWsVentas oResponseWsVentas = new ResponseWsVentas();
+        ClienteDetailResponse client = new ClienteDetailResponse();
 
         try{
-
             Optional<ClienteEntity> clienteEntity = clienteRepository.findByEmail(email);
 
-            if (clienteEntity.isPresent()){
-                Optional<Shipping> shipping = shippingRepository.findByCliente(clienteEntity.get()).stream().map(s -> Shipping.builder()
-                        .idShipping(s.getIdShipping())
-                        .ciudad(s.getCiudad())
-                        .departamento(s.getDepartamento())
-                        .direccion(s.getDireccion())
-                        .pais(s.getPais())
-                        .postalCode(s.getPostalCode())
-                        .build()).findFirst();
-                List<Card> cardList = cardRepository.findByCliente(clienteEntity.get()).stream().map(c -> Card.builder()
-                        .idCard(c.getIdCard())
-                        .creditCard(c.getCreditCard())
-                        .franquicia(c.getFranquicia())
-                        .token(c.getToken())
-                        .build()).collect(Collectors.toList());
-                Optional<Cliente> cliente = clienteEntity.map(cli -> Cliente.builder()
-                        .idCliente(cli.getIdCliente())
-                        .apellido(cli.getApellido())
-                        .nombre(cli.getNombre())
-                        .dni(cli.getDni())
-                        .email(cli.getEmail())
-                        .telefono(cli.getTelefono())
-                        .build());
-                oResponseWS.setResultado(ClienteDetailResponse.builder()
-                                .cliente(cliente.get())
-                                .shipping(shipping.get())
-                                .cardList(cardList)
-                        .build());
+            if (clienteEntity.isPresent()) {
+                client = getUserDetail(clienteEntity.get());
             }
-
-            oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
-
+            oResponseWsVentas.setTipoRespuesta(TipoRespuesta.Exito);
+            oResponseWsVentas.setResultado(client);
 
         } catch (Exception e){
-            oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
-            oResponseWS.setMensaje( e.getMessage() );
+            oResponseWsVentas.setTipoRespuesta(TipoRespuesta.Error);
+            oResponseWsVentas.setMensaje( e.getMessage() );
             log.error("Error consultando email " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
         }
-            return oResponseWS;
+
+        return oResponseWsVentas;
+    }
+
+    public ResponseWsVentas rollbackSale(Venta venta){
+        ResponseWsVentas oResponseWsVentas = new ResponseWsVentas();
+
+        try {
+            Venta ventaUpdated = ventaRepository.rollabackVenta(venta.getIdVenta());
+
+            oResponseWsVentas.setTipoRespuesta(TipoRespuesta.Exito);
+            oResponseWsVentas.setResultado(ventaUpdated);
+        }catch(Exception e){
+            oResponseWsVentas.setTipoRespuesta(TipoRespuesta.Error);
+            oResponseWsVentas.setMensaje( e.getMessage() );
+            log.error("Error rollingback Sale " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
         }
+
+        return oResponseWsVentas;
+    }
+
+    ClienteEntity saveClient(Cliente oClienteReq){
+
+        ClienteEntity cliente =new ClienteEntity();
+        if (oClienteReq.getIdCliente() == null){
+            cliente  = clienteRepository.save(sampleFactory.clienteFactory(oClienteReq));
+        }else{
+            cliente = clienteRepository.findById(oClienteReq.getIdCliente()).get();
+        }
+        return cliente;
+    }
+
+    ShippingEntity saveShipping(Venta venta, ClienteEntity cliente){
+        Optional<ShippingEntity> shippingResult = shippingRepository.findByCliente(cliente).stream()
+                .filter(oShipping -> oShipping.getDireccion().equalsIgnoreCase(venta.getShipping().getDireccion()))
+                .findFirst();
+
+        if (shippingResult.isEmpty()) {
+            return shippingRepository.save(sampleFactory.shippingFactory(venta, cliente));
+        }
+        return shippingResult.get();
+    }
+
+    void saveCard(String idToken,String  franquicia, String maskedCardNumber, ClienteEntity cliente){
+        List<CardEntity> cardList = cardRepository.findByCliente(cliente);
+        Optional<CardEntity> cardResult = cardList.stream()
+                .filter(card -> card.getCreditCard().equalsIgnoreCase(maskedCardNumber))
+                .findFirst();
+
+        if (cardResult.isEmpty()){
+            cardRepository.save(sampleFactory.cardFactory(idToken, franquicia,maskedCardNumber,cliente));
+        }
+    }
+
+    List<DetalleVenta> getDetalleVenta(Venta ventaToUpdate){
+
+        return detalleVentaRepository.findByVenta(new VentaEntity(ventaToUpdate)).stream()
+                .map(p -> DetalleVenta.builder()
+                        .idDetalleVenta(p.getIdDetalleVenta())
+                        .cantidadCompra(p.getCantidad())
+                        .precio(p.getPrecio())
+                        .idInventario(p.getIdInventario())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    ClienteDetailResponse getUserDetail(ClienteEntity clienteEntity){
+
+        Optional<Shipping> shipping = shippingRepository.findByCliente(clienteEntity).stream().map(ShippingEntity::toDto).findFirst();
+        List<Card> cardList = cardRepository.findByCliente(clienteEntity).stream().map(CardEntity::toDto).collect(Collectors.toList());
+        Cliente cliente = clienteEntity.toDto();
+
+        return ClienteDetailResponse.builder()
+                .cliente(cliente)
+                .shipping(shipping.get())
+                .cardList(cardList)
+                .build();
+    }
+
+
 }

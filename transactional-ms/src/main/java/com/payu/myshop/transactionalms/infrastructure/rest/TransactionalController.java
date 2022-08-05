@@ -2,13 +2,11 @@ package com.payu.myshop.transactionalms.infrastructure.rest;
 
 import com.payu.myshop.transactionalms.domain.models.endpoints.AuthorizePaymentRequest;
 import com.payu.myshop.transactionalms.domain.models.endpoints.RefundRequest;
-import com.payu.myshop.transactionalms.domain.models.endpoints.ResponseWS;
+import com.payu.myshop.transactionalms.domain.models.endpoints.ResponseWsTransactional;
 import com.payu.myshop.transactionalms.domain.ports.services.TransactionalService;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -28,8 +26,8 @@ public class TransactionalController {
     TransactionalService transactionalService;
 
     @PostMapping(path = "/payment")
-    public ResponseWS authorizePayment(@Valid @RequestBody AuthorizePaymentRequest request,
-                                       @RequestParam(value = "withToken") Boolean withToken){
+    public ResponseWsTransactional authorizePayment(@Valid @RequestBody AuthorizePaymentRequest request,
+                                                    @RequestParam(value = "withToken") Boolean withToken){
         if (withToken) {
             return transactionalService.authorizePaymentWithToken(request);
         }else {
@@ -37,7 +35,7 @@ public class TransactionalController {
         }
     }
     @PostMapping(path = "/refund")
-    public ResponseWS refundPayment(@Valid @RequestBody RefundRequest request){
+    public ResponseWsTransactional refundPayment(@Valid @RequestBody RefundRequest request){
         return transactionalService.refundPayment(request);
     }
 

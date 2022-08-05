@@ -4,5 +4,6 @@ public enum State {
 
     APPROVED,
     DECLINED,
-    REFUND
+    REFUND,
+    AUTOCANCELLED
 }

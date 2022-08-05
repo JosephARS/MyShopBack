@@ -1,7 +1,7 @@
 package com.payu.myshop.inventarioms.infrastructure.db.persistance;
 
 import com.payu.myshop.inventarioms.domain.exceptions.NotFoundException;
-import com.payu.myshop.inventarioms.domain.models.endpoints.Inventario;
+import com.payu.myshop.inventarioms.domain.models.dto.Inventario;
 import com.payu.myshop.inventarioms.domain.ports.repositories.InventarioRepositoryPort;
 import com.payu.myshop.inventarioms.infrastructure.db.entities.InventarioEntity;
 import com.payu.myshop.inventarioms.infrastructure.db.repository.InventarioRepository;

@@ -45,4 +45,12 @@ public class VentaPersistance implements VentaRepositoryPort {
         return ventaRepository.save(ventaToUpdate.get()).toDto();
     }
 
+    @Override
+    public Venta rollabackVenta(Long idVenta) {
+        Optional<VentaEntity> ventaToUpdate = ventaRepository.findById(idVenta);
+        ventaToUpdate.get().setEstado(State.AUTOCANCELLED.toString());
+
+        return ventaRepository.save(ventaToUpdate.get()).toDto();
+    }
+
 }

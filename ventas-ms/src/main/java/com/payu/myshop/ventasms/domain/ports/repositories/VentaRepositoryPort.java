@@ -12,4 +12,6 @@ public interface VentaRepositoryPort {
     List<Object> findAllVentas();
     Venta updateRefund(Long idVenta);
 
+    Venta rollabackVenta(Long idVenta);
+
 }

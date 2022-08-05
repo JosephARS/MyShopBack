@@ -35,6 +35,8 @@ dependencies {
 	runtimeOnly 'mysql:mysql-connector-java'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	// https://mvnrepository.com/artifact/org.easymock/easymock
+	testImplementation 'org.easymock:easymock:4.3'
 }
 
 dependencyManagement {

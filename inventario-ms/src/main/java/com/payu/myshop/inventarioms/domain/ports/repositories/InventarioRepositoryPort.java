@@ -1,6 +1,6 @@
 package com.payu.myshop.inventarioms.domain.ports.repositories;
 
-import com.payu.myshop.inventarioms.domain.models.endpoints.Inventario;
+import com.payu.myshop.inventarioms.domain.models.dto.Inventario;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

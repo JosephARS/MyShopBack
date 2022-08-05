@@ -1,9 +1,10 @@
 package com.payu.myshop.inventarioms.domain.usecases;
 
 import com.payu.myshop.inventarioms.domain.models.dto.TipoRespuesta;
-import com.payu.myshop.inventarioms.domain.models.endpoints.Inventario;
+import com.payu.myshop.inventarioms.domain.models.dto.Inventario;
+import com.payu.myshop.inventarioms.domain.models.dto.Venta;
 import com.payu.myshop.inventarioms.domain.models.endpoints.ProductDetailResponse;
-import com.payu.myshop.inventarioms.domain.models.endpoints.ResponseWS;
+import com.payu.myshop.inventarioms.domain.models.endpoints.ResponseWsInventario;
 import com.payu.myshop.inventarioms.domain.ports.repositories.InventarioRepositoryPort;
 import com.payu.myshop.inventarioms.domain.ports.services.InventarioService;
 import lombok.AccessLevel;
@@ -11,7 +12,10 @@ import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,31 +30,31 @@ public class InventarioServiceImpl implements InventarioService {
     InventarioRepositoryPort inventarioRepository;
 
     @Override
-    public ResponseWS createProduct(Inventario request) {
+    public ResponseWsInventario createProduct(Inventario request) {
 
-        ResponseWS oResponseWS = new ResponseWS();
-        log.info("Request:" +  request);
+        ResponseWsInventario oResponseWsInventario = new ResponseWsInventario();
+
         try{
             Inventario inventario = inventarioRepository.save(request);
 
-            oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
-            oResponseWS.setResultado(inventario);
+            oResponseWsInventario.setTipoRespuesta(TipoRespuesta.Exito);
+            oResponseWsInventario.setResultado(inventario);
 
 
         } catch (Exception e){
-            oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
-            oResponseWS.setMensaje( e.getMessage() );
+            oResponseWsInventario.setTipoRespuesta(TipoRespuesta.Error);
+            oResponseWsInventario.setMensaje( e.getMessage() );
             log.error("Error creando nuevo producto " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
         }
 
-        return oResponseWS;
+        return oResponseWsInventario;
     }
 
     @Override
 
-    public ResponseWS getProductList() {
+    public ResponseWsInventario getProductList() {
 
-        ResponseWS oResponseWS = new ResponseWS();
+        ResponseWsInventario oResponseWsInventario = new ResponseWsInventario();
         List<Object> oProductList = new ArrayList<Object>();
 
         try {
@@ -60,27 +64,27 @@ public class InventarioServiceImpl implements InventarioService {
 
             log.info(String.valueOf(oProductList));
 
-            oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
-            oResponseWS.setListaResultado(oProductList);
+            oResponseWsInventario.setTipoRespuesta(TipoRespuesta.Exito);
+            oResponseWsInventario.setListaResultado(oProductList);
         } catch (Exception e){
-            oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
-            oResponseWS.setMensaje( e.getMessage() );
+            oResponseWsInventario.setTipoRespuesta(TipoRespuesta.Error);
+            oResponseWsInventario.setMensaje( e.getMessage() );
             log.error("Error consultando productos " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
         }
-        return oResponseWS;
+        return oResponseWsInventario;
     }
 
 
     @Override
-    public ResponseWS getProductById(Long idInventario) {
+    public ResponseWsInventario getProductById(Long idInventario) {
 
-        ResponseWS oResponseWS = new ResponseWS();
+        ResponseWsInventario oResponseWsInventario = new ResponseWsInventario();
 
         try {
             Inventario product = inventarioRepository.findById(idInventario);
 
-            oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
-            oResponseWS.setResultado(ProductDetailResponse.builder()
+            oResponseWsInventario.setTipoRespuesta(TipoRespuesta.Exito);
+            oResponseWsInventario.setResultado(ProductDetailResponse.builder()
                     .idInventario(product.getIdInventario())
                     .nombre(product.getNombre())
                     .descripcion(product.getDescripcion())
@@ -89,71 +93,78 @@ public class InventarioServiceImpl implements InventarioService {
                     .stock(product.getStock())
                     .build());
         } catch (Exception e){
-            oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
-            oResponseWS.setMensaje( e.getMessage() );
+            oResponseWsInventario.setTipoRespuesta(TipoRespuesta.Error);
+            oResponseWsInventario.setMensaje( e.getMessage() );
             log.error("Error consultando productos " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
         }
-        return oResponseWS;
+        return oResponseWsInventario;
     }
 
     @Override
-    public ResponseWS updateProduct(Inventario request) {
+    public ResponseWsInventario updateProduct(Inventario request) {
 
-        ResponseWS oResponseWS = new ResponseWS();
+        ResponseWsInventario oResponseWsInventario = new ResponseWsInventario();
 
         try{
             Inventario inventario = inventarioRepository.updateProduct(request);
 
-            oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
-            oResponseWS.setResultado(inventario);
+            oResponseWsInventario.setTipoRespuesta(TipoRespuesta.Exito);
+            oResponseWsInventario.setResultado(inventario);
 
 
         } catch (Exception e){
-            oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
-            oResponseWS.setMensaje( e.getMessage() );
+            oResponseWsInventario.setTipoRespuesta(TipoRespuesta.Error);
+            oResponseWsInventario.setMensaje( e.getMessage() );
             log.error("Error actualizando producto " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
         }
 
-        return oResponseWS;
+        return oResponseWsInventario;
     }
 
     @Override
-    public ResponseWS deleteProduct(Long idInventario) {
+    public ResponseWsInventario deleteProduct(Long idInventario) {
 
-        ResponseWS oResponseWS = new ResponseWS();
+        ResponseWsInventario oResponseWsInventario = new ResponseWsInventario();
 
         try{
 
             Inventario inventario = inventarioRepository.deleteProduct(idInventario);
 
-            oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
-            oResponseWS.setResultado(inventario);
+            oResponseWsInventario.setTipoRespuesta(TipoRespuesta.Exito);
+            oResponseWsInventario.setResultado(inventario);
 
         } catch (Exception e){
-            oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
-            oResponseWS.setMensaje( e.getMessage() );
+            oResponseWsInventario.setTipoRespuesta(TipoRespuesta.Error);
+            oResponseWsInventario.setMensaje( e.getMessage() );
             log.error("Error eliminando producto " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
         }
 
-        return oResponseWS;
+        return oResponseWsInventario;
     }
 
     @Override
-    public ResponseWS updateStock(List<Inventario> listaProductos, String accion) {
+    public ResponseWsInventario updateStock(List<Inventario> listaProductos, String accion, Long idVenta) {
 
-        ResponseWS oResponseWS = new ResponseWS();
+        ResponseWsInventario oResponseWsInventario = new ResponseWsInventario();
 
         try{
+        //    throw new RuntimeException("Error");
             inventarioRepository.updateStock(listaProductos, accion);
 
-            oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
+            oResponseWsInventario.setTipoRespuesta(TipoRespuesta.Exito);
 
         } catch (Exception e){
-            oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
-            oResponseWS.setMensaje( e.getMessage() );
+            RestTemplate restTemplate = new RestTemplate();
+            String url = "http://localhost:8000/ventas/";
+            Venta venta = Venta.builder().idVenta(idVenta).build();
+            HttpEntity<Venta> httpEntity = new HttpEntity<>(venta);
+            Object result = restTemplate.exchange(url, HttpMethod.PUT, httpEntity, ResponseWsInventario.class);
+
+            oResponseWsInventario.setTipoRespuesta(TipoRespuesta.Error);
+            oResponseWsInventario.setMensaje( e.getMessage() );
             log.error("Error actualizando producto " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
         }
 
-        return oResponseWS;
+        return oResponseWsInventario;
     }
 }

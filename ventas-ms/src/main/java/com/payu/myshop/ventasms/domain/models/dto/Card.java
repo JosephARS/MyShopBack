@@ -15,5 +15,7 @@ public class Card {
     String token;
     String creditCard;
     String franquicia;
+    Cliente cliente;
+
 
 }

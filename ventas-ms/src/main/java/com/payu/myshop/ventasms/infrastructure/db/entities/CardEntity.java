@@ -1,5 +1,6 @@
 package com.payu.myshop.ventasms.infrastructure.db.entities;
 
+import com.payu.myshop.ventasms.domain.models.dto.Card;
 import lombok.*;
 
 import javax.persistence.*;
@@ -25,4 +26,21 @@ public class CardEntity implements Serializable {
     @ManyToOne(optional = false) @JoinColumn(name = "idCliente")
     ClienteEntity cliente;
 
+    public CardEntity(Card card) {
+        idCard = card.getIdCard();
+        token = card.getToken();
+        creditCard = card.getCreditCard();
+        franquicia = card.getFranquicia();
+        cliente = new ClienteEntity(card.getCliente());
+    }
+
+    public Card toDto(){
+        return Card.builder()
+                    .idCard(idCard)
+                    .token(token)
+                    .franquicia(franquicia)
+                    .creditCard(creditCard)
+                    .cliente(cliente.toDto())
+                .build();
+    }
 }

@@ -1,11 +1,27 @@
 package com.payu.myshop.transactionalms.domain.usecases;
 
-import com.payu.myshop.transactionalms.domain.models.dto.*;
+import com.payu.myshop.transactionalms.domain.models.dto.AdditionalValues;
+import com.payu.myshop.transactionalms.domain.models.dto.Buyer;
+import com.payu.myshop.transactionalms.domain.models.dto.CreditCard;
+import com.payu.myshop.transactionalms.domain.models.dto.CreditCardToken;
+import com.payu.myshop.transactionalms.domain.models.dto.ExtraParameters;
+import com.payu.myshop.transactionalms.domain.models.dto.MerchantReq;
+import com.payu.myshop.transactionalms.domain.models.dto.Order;
+import com.payu.myshop.transactionalms.domain.models.dto.OrderRefund;
+import com.payu.myshop.transactionalms.domain.models.dto.Pago;
+import com.payu.myshop.transactionalms.domain.models.dto.RequestCreateTokenPayu;
+import com.payu.myshop.transactionalms.domain.models.dto.RequestPaymentPayu;
+import com.payu.myshop.transactionalms.domain.models.dto.RequestRefundPayu;
+import com.payu.myshop.transactionalms.domain.models.dto.ResponsePaymentPayu;
+import com.payu.myshop.transactionalms.domain.models.dto.TX_dto;
+import com.payu.myshop.transactionalms.domain.models.dto.ThreeDomainSecure;
+import com.payu.myshop.transactionalms.domain.models.dto.Transaccion;
+import com.payu.myshop.transactionalms.domain.models.dto.TransactionRefundReq;
+import com.payu.myshop.transactionalms.domain.models.dto.TransactionReq;
 import com.payu.myshop.transactionalms.domain.models.endpoints.AuthorizePaymentRequest;
 import com.payu.myshop.transactionalms.domain.models.endpoints.AuthorizePaymentResponse;
 import com.payu.myshop.transactionalms.domain.models.endpoints.RefundRequest;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -13,31 +29,76 @@ import java.util.Date;
 @Component
 public class SampleFactory {
 
-    @Autowired
-    private Environment env;
+    @Value("${payuAPI.language}")
+    private  String language;
+
+    @Value("${payuAPI.command}")
+    private  String command;
+    @Value("${payuAPI.test}")
+    private  String test;
+    @Value("${payuAPI.apiKey}")
+    private  String apiKey;
+    @Value("${payuAPI.apiLogin}")
+    private  String apiLogin;
+
+    @Value("${payuAPI.accountId}")
+    private  String accountId;
+
+    @Value("${payuAPI.referenceCode}")
+    private  String referenceCode;
+
+    @Value("${payuAPI.description}")
+    private  String description;
+
+    @Value("${payuAPI.notifyUrl}")
+    private  String notifyUrl;
+
+    @Value("${payuAPI.installmentsNumber}")
+    private  String installmentsNumber;
+    @Value("${payuAPI.type}")
+    private  String type;
+    @Value("${payuAPI.deviceSessionId}")
+    private  String deviceSessionId;
+    @Value("${payuAPI.ipAddress}")
+    private  String ipAddress;
+    @Value("${payuAPI.cookie}")
+    private  String cookie;
+    @Value("${payuAPI.embedded}")
+    private  String embedded;
+    @Value("${payuAPI.eci}")
+    private  String eci;
+    @Value("${payuAPI.cavv}")
+    private  String cavv;
+    @Value("${payuAPI.xid}")
+    private  String xid;
+    @Value("${payuAPI.directoryServerTransactionId}")
+    private  String directoryServerTransactionId;
+    @Value("${payuAPI.userAgent}")
+    private  String userAgent;
+
 
     public RequestPaymentPayu requestPaymentPayu(AuthorizePaymentRequest request){
 
         return RequestPaymentPayu.builder()
-                    .language(env.getProperty("payuAPI.language"))
-                    .command(env.getProperty("payuAPI.command"))
+                    .language(language)
+                    .command(command)
                     .merchant(merchantReq())
                     .transaction(transactionReq(request, false))
-                    .test(Boolean.valueOf("payuAPI.test"))
+                    .test(Boolean.valueOf(test))
                 .build();
     }
 
-    public RequestPaymentPayu requestPaymentWithTokenPayu(AuthorizePaymentRequest request) {
+    public  RequestPaymentPayu requestPaymentWithTokenPayu(AuthorizePaymentRequest request) {
         return RequestPaymentPayu.builder()
-                .language(env.getProperty("payuAPI.language"))
-                .command(env.getProperty("payuAPI.command"))
+                .language(language)
+                .command(command)
                 .merchant(merchantReq())
                 .transaction(transactionReq(request, true))
-                .test(Boolean.valueOf("payuAPI.test"))
+                .test(Boolean.valueOf(test))
                 .build();
     }
 
-    public AuthorizePaymentResponse authorizePaymentResponse(Pago pago, ResponsePaymentPayu result, String creditCardTokenId, String maskedCardNumber){
+    public  AuthorizePaymentResponse authorizePaymentResponse(Pago pago, ResponsePaymentPayu result, String creditCardTokenId, String maskedCardNumber){
         AuthorizePaymentResponse oAuthorizePayment = AuthorizePaymentResponse.builder()
                 .pagoId(pago.getIdPago())
                 .orderId(result.getTransactionResponse().getOrderId())
@@ -59,10 +120,10 @@ public class SampleFactory {
         return oAuthorizePayment;
     }
 
-    public RequestRefundPayu requestRefundPayu(Pago pagoToUpdate, RefundRequest request, Transaccion oTransaccion){
+    public  RequestRefundPayu requestRefundPayu(Pago pagoToUpdate, RefundRequest request, Transaccion oTransaccion){
         return RequestRefundPayu.builder()
-                .language(env.getProperty("payuAPI.language"))
-                .command(env.getProperty("payuAPI.command"))
+                .language(language)
+                .command(command)
                 .merchant(merchantReq())
                 .transaction(TransactionRefundReq.builder()
                         .order(OrderRefund.builder()
@@ -76,10 +137,10 @@ public class SampleFactory {
                 .build();
     }
 
-    public RequestCreateTokenPayu requestCreateTokenPayu(AuthorizePaymentRequest request){
+    public  RequestCreateTokenPayu requestCreateTokenPayu(AuthorizePaymentRequest request){
         return RequestCreateTokenPayu.builder()
-                    .language(env.getProperty("payuAPI.language"))
-                    .command(env.getProperty("payuAPI.createToken.command"))
+                    .language(language)
+                    .command("CREATE_TOKEN")
                     .merchant(merchantReq())
                     .creditCardToken(CreditCardToken.builder()
                                 .payerId("1")
@@ -93,23 +154,22 @@ public class SampleFactory {
     }
 
 
-    MerchantReq merchantReq(){
+     MerchantReq merchantReq(){
         return MerchantReq.builder()
-                .apiKey(env.getProperty("payuAPI.apiKey"))
-                .apiLogin(env.getProperty("payuAPI.apiLogin"))
+                .apiKey(apiKey)
+                .apiLogin(apiLogin)
                 .build();
     }
 
-    TransactionReq transactionReq(AuthorizePaymentRequest request, Boolean withToken){
+     TransactionReq transactionReq(AuthorizePaymentRequest request, Boolean withToken){
 
         TransactionReq transaction = TransactionReq.builder()
                 .order(Order.builder()
-                        .accountId(env.getProperty("payuAPI.accountId"))
-                        .referenceCode(env.getProperty("payuAPI.referenceCode") + new Date())
-                        .description(env.getProperty("payuAPI.description"))
-                        .language(env.getProperty("payuAPI.language"))
-                        //.signature(createSignature(signarure_params))
-                        .notifyUrl(env.getProperty("payuAPI.notifyUrl"))
+                        .accountId(accountId)
+                        .referenceCode(referenceCode + new Date())
+                        .description(description)
+                        .language(language)
+                        .notifyUrl(notifyUrl)
                         .additionalValues(AdditionalValues.builder()
                                 .TX_VALUE(TX_dto.builder()
                                         .value(request.getTotalPrice())
@@ -137,21 +197,21 @@ public class SampleFactory {
                 .payer(request.getPayer())
                 //.creditCard(request.getCreditCard())
                 .extraParameters(ExtraParameters.builder()
-                        .INSTALLMENTS_NUMBER(env.getProperty("payuAPI.installmentsNumber"))
+                        .INSTALLMENTS_NUMBER(installmentsNumber)
                         .build())
-                .type(env.getProperty("payuAPI.type"))
+                .type(type)
                 .paymentMethod(request.getPaymentMethod())
                 .paymentCountry(request.getPaymentCountry())
-                .deviceSessionId(env.getProperty("payuAPI.deviceSessionId"))
-                .ipAddress(env.getProperty("payuAPI.ipAddress"))
-                .cookie(env.getProperty("payuAPI.cookie"))
-                .userAgent(env.getProperty("payuAPI.userAgent"))
+                .deviceSessionId(deviceSessionId)
+                .ipAddress(ipAddress)
+                .cookie(cookie)
+                .userAgent(userAgent)
                 .threeDomainSecure(ThreeDomainSecure.builder()
-                        .embedded(Boolean.valueOf(env.getProperty("payuAPI.embedded")))
-                        .eci(env.getProperty("payuAPI.eci"))
-                        .cavv(env.getProperty("payuAPI.cavv"))
-                        .xid(env.getProperty("payuAPI.xid"))
-                        .directoryServerTransactionId(env.getProperty("payuAPI.directoryServerTransactionId"))
+                        .embedded(Boolean.valueOf(embedded))
+                        .eci(eci)
+                        .cavv(cavv)
+                        .xid(xid)
+                        .directoryServerTransactionId(directoryServerTransactionId)
                         .build())
                 .build();
 
@@ -167,6 +227,37 @@ public class SampleFactory {
         }
 
         return transaction;
+    }
+
+     Pago pagoFactory(AuthorizePaymentRequest request,ResponsePaymentPayu result){
+        return Pago.builder()
+                .payuOrdenId(result.getTransactionResponse().getOrderId())
+                .fecha(new Date())
+                .dniPayer(request.getPayer().getDniNumber())
+                .dniBuyer(request.getBuyer().getDniNumber())
+                .valor(request.getTotalPrice() + request.getTotalTax())
+                .direccion(request.getBuyer().getShippingAddress().getStreet1())
+                .ciudad(request.getBuyer().getShippingAddress().getCity())
+                .pais(request.getBuyer().getShippingAddress().getCountry())
+                .metodoPago(result.getTransactionResponse().getAdditionalInfo().getCardType())
+                .franquicia(request.getPaymentMethod())
+                .estadoPago(result.getTransactionResponse().getState())
+                .build();
+    }
+
+     Transaccion transaccionFactory(Pago pago,ResponsePaymentPayu result) {
+        return Transaccion.builder()
+                .payuTransaccionId(result.getTransactionResponse().getTransactionId())
+                .fecha(new Date())
+                .state(result.getTransactionResponse().getState())
+                .codeResponde(result.getTransactionResponse().getResponseCode())
+                .networkResponseCode(result.getTransactionResponse().getPaymentNetworkResponseCode())
+                .authorizationCode(result.getTransactionResponse().getAuthorizationCode())
+                .responseMessage(result.getTransactionResponse().getResponseMessage())
+                .rejectionType(result.getTransactionResponse().getAdditionalInfo().getRejectionType())
+                .transactionType(result.getTransactionResponse().getAdditionalInfo().getTransactionType())
+                .pago(pago)
+                .build();
     }
 
 }

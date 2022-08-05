@@ -24,7 +24,7 @@ public class DetalleVentaEntity implements Serializable {
 
     Long idInventario;
 
-    @ManyToOne(optional = false) @JoinColumn(name = "idSale")
+    @ManyToOne(optional = false) @JoinColumn(name = "idVenta")
     VentaEntity venta;
 
 

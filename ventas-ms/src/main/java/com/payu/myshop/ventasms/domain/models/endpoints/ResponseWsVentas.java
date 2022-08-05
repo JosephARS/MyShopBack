@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class ResponseWS {
+public class ResponseWsVentas {
 
     private TipoRespuesta tipoRespuesta;	//Enumerador: Puede ser Exito o error.
     private String mensaje = "";

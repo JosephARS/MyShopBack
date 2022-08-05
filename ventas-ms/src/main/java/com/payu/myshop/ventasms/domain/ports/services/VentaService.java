@@ -1,17 +1,19 @@
 package com.payu.myshop.ventasms.domain.ports.services;
 
 import com.payu.myshop.ventasms.domain.models.dto.Venta;
-import com.payu.myshop.ventasms.domain.models.endpoints.ResponseWS;
+import com.payu.myshop.ventasms.domain.models.endpoints.ResponseWsVentas;
 
 public interface VentaService {
 
-    ResponseWS confirmarVenta(Venta request, String idtoken, String maskedCardNumber, String franquicia);
+    ResponseWsVentas confirmSale(Venta request, String idtoken, String maskedCardNumber, String franquicia);
 
-    ResponseWS consultarVentas();
+    ResponseWsVentas getSales();
 
-    ResponseWS anularVenta(Venta request);
+    ResponseWsVentas refundSale(Venta request);
 
-    ResponseWS consultarUsuario(String email);
+    ResponseWsVentas getUser(String email);
+
+    ResponseWsVentas rollbackSale(Venta venta);
 
 
 }

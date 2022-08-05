@@ -1,7 +1,7 @@
 package com.payu.myshop.ventasms.infrastructure.rest;
 
 import com.payu.myshop.ventasms.domain.models.dto.Venta;
-import com.payu.myshop.ventasms.domain.models.endpoints.ResponseWS;
+import com.payu.myshop.ventasms.domain.models.endpoints.ResponseWsVentas;
 import com.payu.myshop.ventasms.domain.ports.services.VentaService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -22,27 +22,32 @@ public class VentaController {
     VentaService ventaService;
 
     @PostMapping(path = "/")
-    public ResponseWS confirmarVenta(@Valid @RequestBody Venta request,
-                                     @RequestParam(value = "idToken", required=false) String idToken,
-                                     @RequestParam(value = "maskedCardNumber", required=false) String maskedCardNumber,
-                                     @RequestParam(value = "franquicia", required=false) String franquicia){
+    public ResponseWsVentas confirmSale(@Valid @RequestBody Venta request,
+                                        @RequestParam(value = "idToken", required=false) String idToken,
+                                        @RequestParam(value = "maskedCardNumber", required=false) String maskedCardNumber,
+                                        @RequestParam(value = "franquicia", required=false) String franquicia){
 
-        return ventaService.confirmarVenta(request, idToken, maskedCardNumber, franquicia);
+        return ventaService.confirmSale(request, idToken, maskedCardNumber, franquicia);
     }
 
     @GetMapping("/")
-    public ResponseWS consultarVentas(){
-        return ventaService.consultarVentas();
+    public ResponseWsVentas getSales(){
+        return ventaService.getSales();
     }
 
     @PostMapping(path = "/refund/")
-    public ResponseWS anularVenta(@Valid @RequestBody Venta request){
-
-        return ventaService.anularVenta(request);
+    public ResponseWsVentas refundSale(@Valid @RequestBody Venta request){
+        return ventaService.refundSale(request);
     }
 
     @GetMapping("/usuario/{email}")
-    public ResponseWS consultarUsuarioEmail(@PathVariable String email){
-        return ventaService.consultarUsuario(email);
+    public ResponseWsVentas getUserEmail(@PathVariable String email){
+        return ventaService.getUser(email);
     }
+
+    @PutMapping("/")
+    public ResponseWsVentas rollbackSale(@Valid @RequestBody Venta venta){
+        return ventaService.rollbackSale(venta);
+    }
+
 }

@@ -1,7 +1,7 @@
 package com.payu.myshop.inventarioms.infrastructure.rest;
 
-import com.payu.myshop.inventarioms.domain.models.endpoints.Inventario;
-import com.payu.myshop.inventarioms.domain.models.endpoints.ResponseWS;
+import com.payu.myshop.inventarioms.domain.models.dto.Inventario;
+import com.payu.myshop.inventarioms.domain.models.endpoints.ResponseWsInventario;
 import com.payu.myshop.inventarioms.domain.ports.services.InventarioService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -29,36 +29,37 @@ public class InventarioController {
     InventarioService inventarioService;
 
     @GetMapping("/")
-    public ResponseWS getProductList(){
+    public ResponseWsInventario getProductList(){
         return inventarioService.getProductList();
     }
 
     @GetMapping("/{idInventario}")
-    public ResponseWS getProductById(@PathVariable Long idInventario){
+    public ResponseWsInventario getProductById(@PathVariable Long idInventario){
         return inventarioService.getProductById(idInventario);
     }
 
     @PostMapping(path = "/")
-    public ResponseWS createProduct(@Valid @RequestBody Inventario request){
+    public ResponseWsInventario createProduct(@Valid @RequestBody Inventario request){
 
         return inventarioService.createProduct(request);
     }
 
     @DeleteMapping(path = "/{idInventario}")
-    public ResponseWS deleteProduct(@PathVariable Long idInventario){
+    public ResponseWsInventario deleteProduct(@PathVariable Long idInventario){
 
         return inventarioService.deleteProduct(idInventario);
     }
 
     @PutMapping(path = "/")
-    public ResponseWS updateProduct(@Valid @RequestBody Inventario request){
+    public ResponseWsInventario updateProduct(@Valid @RequestBody Inventario request){
         return inventarioService.updateProduct(request);
     }
 
-    @PutMapping(path = "/stock/{accion}")
-    public ResponseWS updateStock(@Valid @RequestBody List<Inventario> listaProductos,
-                                  @PathVariable String accion){
-        return inventarioService.updateStock(listaProductos, accion);
+    @PutMapping(path = "/stock/{accion}/{idVenta}")
+    public ResponseWsInventario updateStock(@Valid @RequestBody List<Inventario> listaProductos,
+                                            @PathVariable String accion,
+                                            @PathVariable Long idVenta){
+        return inventarioService.updateStock(listaProductos, accion, idVenta);
     }
 
 
